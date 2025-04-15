@@ -40,13 +40,11 @@ static bool debug_nn = false; // Set this to true to see e.g. features generated
 void print_inference_result(ei_impulse_result_t result) {
 
     // Print how long it took to perform inference
-    ei_printf("Timing: DSP %d ms, inference %d ms, anomaly %d ms\r\n",
+    ei_printf("Timing: DSP %d ms, inference %d ms\r\n",
             result.timing.dsp,
-            result.timing.classification,
-            result.timing.anomaly);
+            result.timing.classification);
 
     // Print the prediction results (object detection)
-#if EI_CLASSIFIER_OBJECT_DETECTION == 1
     ei_printf("Object detection bounding boxes:\r\n");
     for (uint32_t i = 0; i < result.bounding_boxes_count; i++) {
         ei_impulse_result_bounding_box_t bb = result.bounding_boxes[i];
@@ -62,37 +60,17 @@ void print_inference_result(ei_impulse_result_t result) {
                 bb.height);
     }
 
-    // Print the prediction results (classification)
-#else
-    ei_printf("Predictions:\r\n");
-    for (uint16_t i = 0; i < EI_CLASSIFIER_LABEL_COUNT; i++) {
-        ei_printf("  %s: ", ei_classifier_inferencing_categories[i]);
-        ei_printf("%.5f\r\n", result.classification[i].value);
-    }
-#endif
-
-    // Print anomaly result (if it exists)
-#if EI_CLASSIFIER_HAS_ANOMALY == 1
-    ei_printf("Anomaly prediction: %.3f\r\n", result.anomaly);
-#endif
-
 }
 
 extern "C" int app_main()
 {
-    
-
     ei_sleep(100);
-
     if (ei_camera_init() == false) {
         ei_printf("Failed to initialize Camera!\r\n");
     }
     else {
         ei_printf("Camera initialized\r\n");
     }
-
-    
-
     ei_impulse_result_t result = { nullptr };
 
     ei_printf("Edge Impulse standalone inferencing (Espressif ESP32)\n");
