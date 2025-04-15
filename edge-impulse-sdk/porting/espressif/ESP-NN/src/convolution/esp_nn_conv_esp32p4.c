@@ -50,7 +50,7 @@
 
 #include <stdio.h>
 #include <edge-impulse-sdk/porting/espressif/ESP-NN/include/esp_nn_defs.h>
-#include "esp_nn_generic_opt.h"
+#include "../../include/esp_nn_generic_opt.h"
 
 #include <edge-impulse-sdk/porting/espressif/ESP-NN/src/common/common_functions.h>
 

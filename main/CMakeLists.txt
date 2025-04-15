@@ -3,12 +3,35 @@ cmake_minimum_required(VERSION 3.13.1)
 set(MODEL_FOLDER ..)
 set(EI_SDK_FOLDER ../edge-impulse-sdk)
 
+set(SDKCONFIG_OUTPUT "${CMAKE_SOURCE_DIR}/sdkconfig")
+
+if(IDF_TARGET STREQUAL "esp32s3")
+    set(SDKCONFIG_TARGET "${CMAKE_SOURCE_DIR}/sdkconfig.s3")
+elseif(IDF_TARGET STREQUAL "esp32p4")
+    set(SDKCONFIG_TARGET "${CMAKE_SOURCE_DIR}/sdkconfig.p4")
+else()
+    message(FATAL_ERROR "Unsupported target: ${IDF_TARGET}")
+endif()
+
+# Copy the per-target config to sdkconfig before build
+configure_file(${SDKCONFIG_TARGET} ${SDKCONFIG_OUTPUT} COPYONLY)
+
+# Register a post-build command to copy it back if it's changed
+add_custom_target(save_sdkconfig ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${SDKCONFIG_OUTPUT} ${SDKCONFIG_TARGET}
+    COMMENT "Saving sdkconfig back to ${SDKCONFIG_TARGET}"
+)
+
+
 if(NOT CMAKE_BUILD_EARLY_EXPANSION)
     # enables generic ESP-NN optimizations by Espressif
     add_definitions(-DEI_CLASSIFIER_TFLITE_ENABLE_ESP_NN=1)
     # conditionally enable ESP32S3 specific optimizations
     if(${IDF_TARGET} STREQUAL "esp32s3")
         add_definitions(-DEI_CLASSIFIER_TFLITE_ENABLE_ESP_NN_S3=1)
+    elseif(${IDF_TARGET} STREQUAL "esp32p4")
+        add_definitions(-DEI_CLASSIFIER_TFLITE_ENABLE_ESP_NN_P4=1)
     endif()
 endif()
 

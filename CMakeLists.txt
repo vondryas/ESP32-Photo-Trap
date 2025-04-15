@@ -2,8 +2,10 @@ cmake_minimum_required(VERSION 3.13.1)
 
 set (CMAKE_CXX_STANDARD 17)
 
+
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
-project(ei_standalone_esp32)
+
+project(ESP32-Photo-Trap)
 
 idf_build_set_property(COMPILE_OPTIONS "-fdiagnostics-color=always" APPEND)
 idf_build_set_property(COMPILE_OPTIONS "-Wno-unused-variable" APPEND)
