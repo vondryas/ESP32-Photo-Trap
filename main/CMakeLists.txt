@@ -3,25 +3,23 @@ cmake_minimum_required(VERSION 3.13.1)
 set(MODEL_FOLDER ..)
 set(EI_SDK_FOLDER ../edge-impulse-sdk)
 
-set(SDKCONFIG_OUTPUT "${CMAKE_SOURCE_DIR}/sdkconfig")
+set(SDKCONFIG_OUTPUT "../sdkconfig")
 
 if(IDF_TARGET STREQUAL "esp32s3")
-    set(SDKCONFIG_TARGET "${CMAKE_SOURCE_DIR}/sdkconfig.s3")
+    set(SDKCONFIG_TARGET "../sdkconfig.s3")
+    set(SDKCFG "sdkconfig.s3")
 elseif(IDF_TARGET STREQUAL "esp32p4")
-    set(SDKCONFIG_TARGET "${CMAKE_SOURCE_DIR}/sdkconfig.p4")
+    set(SDKCONFIG_TARGET "../sdkconfig.p4")
+    set(SDKCFG "sdkconfig.p4")
 else()
     message(FATAL_ERROR "Unsupported target: ${IDF_TARGET}")
 endif()
 
-# Copy the per-target config to sdkconfig before build
 configure_file(${SDKCONFIG_TARGET} ${SDKCONFIG_OUTPUT} COPYONLY)
 
+
 # Register a post-build command to copy it back if it's changed
-add_custom_target(save_sdkconfig ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${SDKCONFIG_OUTPUT} ${SDKCONFIG_TARGET}
-    COMMENT "Saving sdkconfig back to ${SDKCONFIG_TARGET}"
-)
+
 
 
 if(NOT CMAKE_BUILD_EARLY_EXPANSION)

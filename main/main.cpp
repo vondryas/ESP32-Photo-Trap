@@ -24,12 +24,15 @@
 #include <stdio.h>
 
 #include "edge-impulse-sdk/classifier/ei_run_classifier.h"
+#include "edge-impulse-sdk/dsp/image/image.hpp"
 
 #include "driver/gpio.h"
 #include "sdkconfig.h"
 #include "esp_idf_version.h"
 
 #define LED_PIN GPIO_NUM_3
+
+
 
 
 static const float features[] = {

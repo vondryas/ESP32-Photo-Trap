@@ -7,6 +7,7 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
 project(ESP32-Photo-Trap)
 
+
 idf_build_set_property(COMPILE_OPTIONS "-fdiagnostics-color=always" APPEND)
 idf_build_set_property(COMPILE_OPTIONS "-Wno-unused-variable" APPEND)
 idf_build_set_property(COMPILE_OPTIONS "-Wno-maybe-uninitialized" APPEND)
