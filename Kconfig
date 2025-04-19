@@ -1,0 +1,19 @@
+menu "Espressif Video Configuration"
+    config DevEUI
+        string "DevEUI"
+        default "FFFF000000000000"
+        help
+            Enter your DevEUI from The Things Network
+ 
+    config AppEUI
+        string "AppEUI"
+        default "0000000000000000"
+        help
+            Enter your AppEUI (JoinEUI) from The Things Network
+
+    config AppKey
+        string "AppKey"
+        default "FFFF000000000000FFFF000000000000"
+        help
+            Enter your AppKey from The Things Network
+endmenu
