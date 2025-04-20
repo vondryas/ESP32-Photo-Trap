@@ -9,6 +9,7 @@
 #include <string>
 #include <cstring>
 
+// From esp32-arduino
 enum SerialConfig {
     SERIAL_5N1 = 0x8000010,
     SERIAL_6N1 = 0x8000014,
@@ -36,20 +37,25 @@ enum SerialConfig {
     SERIAL_8O2 = 0x800003f
   };
 
+// ESP-IDF does not have a delay function that takes milliseconds as an argument
 #define delay(ms) vTaskDelay(ms / portTICK_PERIOD_MS)
+
 #define HEX 16
 #define DEC 10
 
-
+// ESP-IDF does not have a millis function that returns milliseconds since boot
 inline unsigned long millis() {
     return (unsigned long)(esp_timer_get_time() / 1000ULL);
 }
 
+// Class to handle strings in a way similar to Arduino's String class.
+// Implemented only the methods that are needed for the LoRaWAN library.
 class String {
 private:
     std::string _data;
 public:
     String() : _data("") {}
+    String(char ch) : _data(1, ch) {}
     String(const char* str) : _data(str) {}
     String(const std::string& str) : _data(str) {}
     String(const String& other) : _data(other._data) {}
@@ -138,6 +144,9 @@ public:
     }
 };
 
+
+// Class to handle serial communication in a way similar to Arduino's HardwareSerial class.
+// Implemented only the methods that are needed for the LoRaWAN library.
 class HardwareSerial {
 private:
     uart_port_t _uart_num;
@@ -168,6 +177,7 @@ public:
         uart_param_config(_uart_num, &uart_config);
         uart_set_pin(_uart_num, _tx_pin, _rx_pin, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
     }
+
     void println(const String& msg) {
 
         uart_write_bytes(_uart_num, msg.c_str(), msg.length());
@@ -185,10 +195,10 @@ public:
         String result;
         char ch;
         while (true) {
-            int len = uart_read_bytes(_uart_num, (uint8_t*)&ch, 1, 100 / portTICK_PERIOD_MS);
+            int len = uart_read_bytes(_uart_num, (char*)&ch, 1, 100 / portTICK_PERIOD_MS);
             if (len > 0) {
                 if (ch == terminator) break;
-                result += ch;
+                result += String(ch);
             } else {
                 break;
             }

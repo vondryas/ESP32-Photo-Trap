@@ -2,17 +2,27 @@
 
 bool is_camera_buffer_allocated = false;
 uint8_t *image_buffer = NULL; 
+uint8_t *image_inference_buffer = NULL; // Buffer for the image data used for inference
 
-bool allocate_image_buffer(void)
+bool allocate_image_buffers(void)
 {
     if (is_camera_buffer_allocated) {
         return true;
     }
 
     // Allocate the image buffer
-    image_buffer = (uint8_t *)malloc(EI_CAMERA_RAW_FRAME_BUFFER_COLS * EI_CAMERA_RAW_FRAME_BUFFER_ROWS * EI_CAMERA_FRAME_BYTE_SIZE);
+    image_buffer = (uint8_t *)malloc(CAMERA_RAW_FRAME_BUFFER_COLS * CAMERA_RAW_FRAME_BUFFER_ROWS * CAMERA_FRAME_BYTE_SIZE);
+    
     if (image_buffer == NULL) {
         ei_printf("Failed to allocate image buffer\n");
+        return false;
+    }
+    
+    image_inference_buffer = (uint8_t *)malloc(CAMERA_RAW_FRAME_BUFFER_COLS * CAMERA_RAW_FRAME_BUFFER_ROWS * CAMERA_FRAME_BYTE_SIZE);;
+    if (image_inference_buffer == NULL) {
+        ei_printf("Failed to allocate image inference buffer\n");
+        free(image_buffer);
+        image_buffer = NULL;
         return false;
     }
 
@@ -20,7 +30,7 @@ bool allocate_image_buffer(void)
     return true;
 }
 
-void free_image_buffer(void)
+void free_image_buffers(void)
 {
     if (!is_camera_buffer_allocated) {
         return;
@@ -29,5 +39,11 @@ void free_image_buffer(void)
         free(image_buffer);
         image_buffer = NULL;
     }
+
+    if (image_inference_buffer != NULL) {
+        free(image_inference_buffer);
+        image_inference_buffer = NULL;
+    }
+
     is_camera_buffer_allocated = false;
 }

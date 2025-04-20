@@ -19,3 +19,11 @@ dependencies:
     version: ^0.9.0~1
     rules:
       - if: "target == esp32p4"
+  espressif/esp32_s3_eye_noglib: 
+    version: ^5.0.0
+    rules:
+      - if: "target == esp32s3"
+  espressif/esp32_p4_function_ev_board_noglib:
+    version: ^5.0.0
+    rules:
+      - if: "target == esp32p4" 

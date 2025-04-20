@@ -4,3 +4,5 @@ build/
 *.old
 managed_components/
 sdkconfig
+sdkconfig.p4
+sdkconfig.s3

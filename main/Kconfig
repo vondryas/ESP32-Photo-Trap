@@ -1,4 +1,4 @@
-menu "Espressif Video Configuration"
+menu "LoRaWAN Configuration"
     config DevEUI
         string "DevEUI"
         default "FFFF000000000000"

@@ -18,9 +18,6 @@ endif()
 configure_file(${SDKCONFIG_TARGET} ${SDKCONFIG_OUTPUT} COPYONLY)
 
 
-# Register a post-build command to copy it back if it's changed
-
-
 
 if(NOT CMAKE_BUILD_EARLY_EXPANSION)
     # enables generic ESP-NN optimizations by Espressif
@@ -50,6 +47,7 @@ set(include_dirs
     ${EI_SDK_FOLDER}
     camera
     lorawan
+    sdcard
 )
 
 include(${EI_SDK_FOLDER}/cmake/utils.cmake)
@@ -61,6 +59,8 @@ RECURSIVE_FIND_FILE_EXCLUDE_DIR(S_FILES "../edge-impulse-sdk" "CMSIS" "*.s")
 RECURSIVE_FIND_FILE_EXCLUDE_DIR(C_FILES "../edge-impulse-sdk" "CMSIS" "*.c")
 RECURSIVE_FIND_FILE_EXCLUDE_DIR(CAMERA_FILES "camera" "CMSIS" "*.cpp")
 RECURSIVE_FIND_FILE_EXCLUDE_DIR(LORAWAN_FILES "lorawan" "CMSIS" "*.cpp")
+RECURSIVE_FIND_FILE_EXCLUDE_DIR(SDCARD_FILES "sdcard" "CMSIS" "*.cpp")
+
 
 
 
@@ -70,6 +70,7 @@ list(APPEND SOURCE_FILES ${CC_FILES})
 list(APPEND SOURCE_FILES ${MODEL_FILES})
 list(APPEND SOURCE_FILES ${CAMERA_FILES})
 list(APPEND SOURCE_FILES ${LORAWAN_FILES})
+list(APPEND SOURCE_FILES ${SDCARD_FILES})
 
 idf_component_register(SRCS "main.cpp" "${SOURCE_FILES}"
                         INCLUDE_DIRS "${include_dirs}")
