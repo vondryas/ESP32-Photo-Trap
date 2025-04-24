@@ -1,6 +1,6 @@
 # ESP32 Photo Trap – Wildlife Detection using Edge Impulse (FOMO)
 
-This project is a **photo trap** built on the **ESP32-S3** platform (or experimentally ESP32-P4) that uses an **Edge Impulse-trained neural network** to detect wildlife (e.g., deer, wild boars) and sends occurrences to **The Things Network (TTN)** via **LoRaWAN** using an **M5Stack LoRaWAN Module (EU868)**. For receiving the data, you can use application in [this](INSERT-LINK-HERE) repository.
+This project is a **photo trap** built on the **ESP32-S3** platform (or experimentally ESP32-P4) that uses an **Edge Impulse-trained neural network** to detect wildlife (e.g., deer, wild boars) and sends occurrences to **The Things Network (TTN)** via **LoRaWAN** using an **M5Stack LoRaWAN Module (EU868)**. For receiving the data, you can use application in [this](https://github.com/vondryas/Wild-animal-detector-data-receiver) repository.
 
 After successful detection will wail 1 minute before it can detect again. This is to prevent too many multiple detections of the same animal in a short time. Sending images and storing images on the SD card will be executed at the same time. Device try to connect to TTN for 70 seconds. After that it will stop and go to sleep. To succesfully send the data you must be in range of gateway. Tested on 1.5 km with SenseCap M2 LoRaWAN gateway and M5Stack lorawan module.
 
