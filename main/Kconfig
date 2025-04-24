@@ -1,7 +1,7 @@
 menu "LoRaWAN Configuration"
     config DevEUI
         string "DevEUI"
-        default "FFFF000000000000"
+        default "0000000000000000"
         help
             Enter your DevEUI from The Things Network
  
@@ -13,7 +13,7 @@ menu "LoRaWAN Configuration"
 
     config AppKey
         string "AppKey"
-        default "FFFF000000000000FFFF000000000000"
+        default "00000000000000000000000000000000"
         help
             Enter your AppKey from The Things Network
 endmenu

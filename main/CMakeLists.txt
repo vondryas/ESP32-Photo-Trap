@@ -3,21 +3,6 @@ cmake_minimum_required(VERSION 3.13.1)
 set(MODEL_FOLDER ..)
 set(EI_SDK_FOLDER ../edge-impulse-sdk)
 
-set(SDKCONFIG_OUTPUT "../sdkconfig")
-
-if(IDF_TARGET STREQUAL "esp32s3")
-    set(SDKCONFIG_TARGET "../sdkconfig.s3")
-    set(SDKCFG "sdkconfig.s3")
-elseif(IDF_TARGET STREQUAL "esp32p4")
-    set(SDKCONFIG_TARGET "../sdkconfig.p4")
-    set(SDKCFG "sdkconfig.p4")
-else()
-    message(FATAL_ERROR "Unsupported target: ${IDF_TARGET}")
-endif()
-
-configure_file(${SDKCONFIG_TARGET} ${SDKCONFIG_OUTPUT} COPYONLY)
-
-
 
 if(NOT CMAKE_BUILD_EARLY_EXPANSION)
     # enables generic ESP-NN optimizations by Espressif
@@ -57,12 +42,9 @@ RECURSIVE_FIND_FILE_EXCLUDE_DIR(MODEL_FILES "../tflite-model" "CMSIS" "*.cpp")
 RECURSIVE_FIND_FILE_EXCLUDE_DIR(CC_FILES "../edge-impulse-sdk" "CMSIS" "*.cc")
 RECURSIVE_FIND_FILE_EXCLUDE_DIR(S_FILES "../edge-impulse-sdk" "CMSIS" "*.s")
 RECURSIVE_FIND_FILE_EXCLUDE_DIR(C_FILES "../edge-impulse-sdk" "CMSIS" "*.c")
-RECURSIVE_FIND_FILE_EXCLUDE_DIR(CAMERA_FILES "camera" "CMSIS" "*.cpp")
 RECURSIVE_FIND_FILE_EXCLUDE_DIR(LORAWAN_FILES "lorawan" "CMSIS" "*.cpp")
 RECURSIVE_FIND_FILE_EXCLUDE_DIR(SDCARD_FILES "sdcard" "CMSIS" "*.cpp")
-
-
-
+RECURSIVE_FIND_FILE_EXCLUDE_DIR(CAMERA_FILES "camera" "CMSIS" "*.cpp")
 
 list(APPEND SOURCE_FILES ${S_FILES})
 list(APPEND SOURCE_FILES ${C_FILES})
@@ -71,8 +53,9 @@ list(APPEND SOURCE_FILES ${MODEL_FILES})
 list(APPEND SOURCE_FILES ${CAMERA_FILES})
 list(APPEND SOURCE_FILES ${LORAWAN_FILES})
 list(APPEND SOURCE_FILES ${SDCARD_FILES})
+list(APPEND SOURCE_FILES ${CAMERA_FILES})  # Ensure CAMERA_FILES is included
 
-idf_component_register(SRCS "main.cpp" "${SOURCE_FILES}"
+idf_component_register(SRCS "main.cpp" "${SOURCE_FILES}" 
                         INCLUDE_DIRS "${include_dirs}")
 
 target_compile_options(${COMPONENT_LIB} PRIVATE -std=gnu++17)

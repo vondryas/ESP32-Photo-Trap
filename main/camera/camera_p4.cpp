@@ -1,6 +1,5 @@
 #include "photo_trap_camera.hpp"
 #if defined(CONFIG_IDF_TARGET_ESP32P4)
-#include "who_cam.hpp"
 #include "string.h"
 
 who::cam::WhoP4Cam *camera = nullptr;
@@ -12,7 +11,7 @@ static bool is_camera_initialised = false;
  *
  * @retval  false if initialisation failed
  */
-bool ei_camera_init(void)
+bool camera_init(void)
 {
 
     camera = new who::cam::WhoP4Cam(who::cam::VIDEO_PIX_FMT_RGB888, 3, V4L2_MEMORY_USERPTR, true);
@@ -27,7 +26,7 @@ bool ei_camera_init(void)
 /**
  * @brief      Stop streaming of sensor data
  */
-void ei_camera_deinit(void)
+void camera_deinit(void)
 {
 
     if (camera != nullptr)
@@ -50,7 +49,7 @@ void ei_camera_deinit(void)
  * @retval     false if not initialised, image captured, rescaled or cropped failed
  *
  */
-bool ei_camera_capture(uint32_t img_width, uint32_t img_height, uint8_t *out_buf)
+bool camera_capture(uint32_t img_width, uint32_t img_height, uint8_t *out_buf)
 {
 
     bool do_resize = false;
@@ -68,6 +67,8 @@ bool ei_camera_capture(uint32_t img_width, uint32_t img_height, uint8_t *out_buf
         return false;
     }
 
+    ESP_LOGI("Camera", "Captured image %d x %d", fb->width, fb->height);
+    ESP_LOGI("Camera", "Image buffer size %d", fb->len);
     memcpy(image_buffer, fb->buf, fb->len);
     memcpy(out_buf, fb->buf, fb->len);
 
@@ -98,7 +99,7 @@ bool ei_camera_capture(uint32_t img_width, uint32_t img_height, uint8_t *out_buf
     return true;
 }
 
-int ei_camera_get_data(size_t offset, size_t length, float *out_ptr)
+int camera_get_data(size_t offset, size_t length, float *out_ptr)
 {
     // we already have a RGB888 buffer, so recalculate offset into pixel index
     size_t pixel_ix = offset * 3;

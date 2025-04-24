@@ -5,7 +5,10 @@ set (CMAKE_CXX_STANDARD 17)
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
+
+
 project(ESP32-Photo-Trap)
+
 
 
 idf_build_set_property(COMPILE_OPTIONS "-fdiagnostics-color=always" APPEND)

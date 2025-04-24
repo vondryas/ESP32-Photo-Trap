@@ -37,5 +37,11 @@ void free_image_buffers(void);
 
 extern uint8_t *image_buffer; // Buffer for the image data
 extern uint8_t *image_inference_buffer; // Buffer for the image data used for inference
+extern size_t image_buffer_size; // Size of the image buffer
+
+#if defined(CONFIG_IDF_TARGET_ESP32P4)
+#include "who_cam.hpp"
+extern who::cam::WhoP4Cam *camera; // Pointer to the camera object
+#endif
 
 #endif /* PHOTO_TRAP_CAMERA_HPP */

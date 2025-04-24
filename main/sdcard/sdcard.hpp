@@ -9,6 +9,7 @@
 #include "freertos/semphr.h"
 #include "../camera/photo_trap_camera.hpp"
 
+
 // Use this function in freertos task to store data to SD card
 // will 
 void store_to_sdcard_task(void *arg);

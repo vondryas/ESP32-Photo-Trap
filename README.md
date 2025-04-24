@@ -6,7 +6,7 @@ This repository runs an exported impulse on the Espressif ESP32. See the documen
 
 ### Hardware
 
-* [ESP-EYE](https://www.espressif.com/en/products/devkits/esp-eye/overview).
+* [ESP-EYE](https://www.espressif.com/en/products/devkits/esp-eye/overview) or [ESP32-P4-Function-EV-Board](https://www.espressif.com/en/products/devkits/esp32-p4-function-ev-board/overview).
 
 While the script is mainly tested with ESP-EYE, other ESP32-based development boards will work too.
 

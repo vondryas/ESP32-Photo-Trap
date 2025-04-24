@@ -13,15 +13,18 @@
 #include "esp_idf_version.h"
 #include "bsp/esp-bsp.h"
 
+
 #define EDGE_IMPULSE_DEBUG false
 const char *TAG = "main";
 
 // Will know if device is joined to the network or not after deep sleep
-RTC_DATA_ATTR bool lorawan_joined = false;
+RTC_NOINIT_ATTR bool lorawan_joined = false;
+
+RTC_NOINIT_ATTR bool power_on = false; // Will know if device was powered on or not after deep sleep
 
 // Will be used to have some timeout after successful inference
-// -60 seconds so device will work after power on
-RTC_DATA_ATTR int64_t last_inference_time_us = -60 * 1000000; // 60 seconds
+RTC_NOINIT_ATTR time_t last_inference_time; 
+ 
 
 // Board specific settings
 #if defined(CONFIG_IDF_TARGET_ESP32S3)
@@ -42,10 +45,13 @@ bsp_led_t bsp_led = BSP_LED_GREEN;
 
 #endif
 
+// Check if lorawan module have new event
+// for example Join event
 void lorawan_loop_task(void *arg)
 {
     while (1)
     {
+
         lorawan.update();
         vTaskDelay(10 / portTICK_PERIOD_MS);
     }
@@ -98,73 +104,49 @@ void send_task(const ei_impulse_result_t *result, bool try_second_time = true)
     }
 }
 
-void print_inference_result(ei_impulse_result_t *result)
-{
-
-    // Print how long it took to perform inference
-    ei_printf("Timing: DSP %d ms, inference %d ms\r\n",
-              result->timing.dsp,
-              result->timing.classification);
-
-    // Print the prediction results (object detection)
-    ei_printf("Object detection bounding boxes:\r\n");
-    for (uint32_t i = 0; i < result->bounding_boxes_count; i++)
-    {
-        ei_impulse_result_bounding_box_t bb = result->bounding_boxes[i];
-        if (bb.value == 0)
-        {
-            continue;
-        }
-        ei_printf("  %s (%f) [ x: %u, y: %u, width: %u, height: %u ]\r\n",
-                  bb.label,
-                  bb.value,
-                  bb.x,
-                  bb.y,
-                  bb.width,
-                  bb.height);
-    }
-}
 
 extern "C" int app_main()
 {
-    // time in microseconds
-    int64_t now = esp_timer_get_time();
-
-    // will try
-    if ((now - last_inference_time_us) < 60 * 1000000) {
-        
-        esp_deep_sleep_start();
-    }
-    
-
-    
     // results of the inference
     ei_impulse_result_t result = {nullptr};
     // semaphore for store task
     done_sem = xSemaphoreCreateBinary();
-
-    // turn off the LED
-    bsp_leds_init();
-    bsp_led_set(bsp_led, false);
-
+    
+    time_t now;
+    
     // set up the wakeup GPIO
     gpio_set_pull_mode(WAKEUP_GPIO, GPIO_PULLDOWN_ONLY);
     gpio_set_direction(WAKEUP_GPIO, GPIO_MODE_INPUT);
-
+    
     // set up the wakeup GPIO to wake up the ESP32-S3 from deep sleep
     esp_sleep_enable_ext1_wakeup(1ULL << WAKEUP_GPIO, ESP_EXT1_WAKEUP_ANY_HIGH);
-
+    
     // Know if program was started from deep sleep or not
     esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
     if (wakeup_reason == ESP_SLEEP_WAKEUP_EXT1)
     {
-        ESP_LOGI(TAG, "wake up from timer interrupt");
+        power_on = false;
+        ESP_LOGI(TAG, "wake up from PIR interrupt");
     }
     else
     {
+        power_on = true;
+        time(&last_inference_time);
         ESP_LOGI(TAG, "Turn On device");
     }
-
+    
+    time(&now);
+    
+    // check if device is powered on or if last inference was less than 60 seconds ago 
+    if (!power_on && (difftime(now, last_inference_time) < 60)) {
+        esp_deep_sleep_start();
+    }
+    
+    // turn off the LED
+    bsp_leds_init();
+    bsp_led_set(bsp_led, false);
+    
+    
     // loraWAN initialization
     if (lorawan_init(lorawan_loop_task) == false)
     {
@@ -184,8 +166,24 @@ extern "C" int app_main()
         vTaskDelay(1000 / portTICK_PERIOD_MS);
         esp_deep_sleep_start();
     }
+    
+    // Image buffer for inference have better colors after some frames
+    for (int i = 0; i < 20; i++)
+    {
+        #if defined(CONFIG_IDF_TARGET_ESP32P4)
+        camera->cam_fb_get();
+        camera->cam_fb_return();
+
+        #elif defined(CONFIG_IDF_TARGET_ESP32S3)
+        camera_fb_t *fb = esp_camera_fb_get();
+        esp_camera_fb_return(fb);
+
+        #endif
+    }
 
     ei_printf("Camera initialized\r\n");
+
+    // SD card initialization
 
     // allocate image buffers for the image data
     if (allocate_image_buffers() == false)
@@ -195,6 +193,7 @@ extern "C" int app_main()
         vTaskDelay(1000 / portTICK_PERIOD_MS);
         esp_deep_sleep_start();
     }
+
 
     // Set up signal for edge impulse classifier
     signal_t signal;
@@ -223,42 +222,35 @@ extern "C" int app_main()
         return res;
     }
 
-    // Stop the camera and deinitialize it
-    camera_deinit();
-
-    print_inference_result(&result);
-
+    
     // if the inference result contains any detected classes, send the data to LoRaWAN
     // and store the image to SD card
     if (check_inference_result(&result))
     {
+        ei_printf("Object detected\r\n");
         // successful inference, store time
-        last_inference_time_us = now;
+        time(&last_inference_time);
         // store the image to SD card
-        xTaskCreate(store_to_sdcard_task, "store_to_sdcard_task", 4096, NULL, 5, NULL);
+        xTaskCreate(store_to_sdcard_task, "store_to_sdcard_task", 4096	* 4, NULL, 5, NULL);
         //send the data to LoRaWAN
         send_task(&result);
     } 
     else
     {
+        ei_printf("No object detected\r\n");
+
         // if no object detected, no store task is needed
         xSemaphoreGive(done_sem);   
     }
-
     // wait for store task to complete
     xSemaphoreTake(done_sem, portMAX_DELAY);
-    // print heap size
-    size_t free_heap = esp_get_free_heap_size();
-    ei_printf("Free heap size: %d bytes\r\n", free_heap);
+    
+    // Stop the camera and deinitialize it
+    camera_deinit();
 
     // free the image buffers
     free_image_buffers();
-
-    // wait for the PIR sensor to be on low level max 2 seconds
-    while (!(gpio_get_level(WAKEUP_GPIO) == 0))
-    {
-        printf("Waiting for PIR sensor to be on low level...\n");
-    }
+    
 
     // Sleep until the PIR sensor is triggered and start app_main() again
     esp_deep_sleep_start();

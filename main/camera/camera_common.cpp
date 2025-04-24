@@ -3,6 +3,7 @@
 bool is_camera_buffer_allocated = false;
 uint8_t *image_buffer = NULL; 
 uint8_t *image_inference_buffer = NULL; // Buffer for the image data used for inference
+size_t image_buffer_size = 0;
 
 bool allocate_image_buffers(void)
 {

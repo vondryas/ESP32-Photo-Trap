@@ -1,6 +1,7 @@
 #include "photo_trap_camera.hpp"
 #if defined(CONFIG_IDF_TARGET_ESP32S3)
 #include "esp_camera.h"
+#include "esp_log.h"
 #include <string.h>
 
 // Camera pins
@@ -51,9 +52,9 @@ static camera_config_t camera_config = {
     .frame_size = FRAMESIZE_HD,     // 1280x720
 
     .jpeg_quality = 5, // 0-63 lower number means higher quality
-    .fb_count = 1,      // if more than one, i2s runs in continuous mode. Use only with JPEG
+    .fb_count = 2,      // if more than one, i2s runs in continuous mode. Use only with JPEG
     .fb_location = CAMERA_FB_IN_PSRAM,
-    .grab_mode = CAMERA_GRAB_WHEN_EMPTY,
+    .grab_mode = CAMERA_GRAB_LATEST,
 };
 
 
@@ -63,10 +64,6 @@ bool camera_init(void)
     if (is_camera_initialised)
         return true;
 
-#if defined(CAMERA_MODEL_ESP_EYE)
-    pinMode(13, INPUT_PULLUP);
-    pinMode(14, INPUT_PULLUP);
-#endif
 
     // initialize the camera
     esp_err_t err = esp_camera_init(&camera_config);
@@ -129,7 +126,10 @@ bool camera_capture(uint32_t img_width, uint32_t img_height, uint8_t *out_buf)
         return false;
     }
 
+    image_buffer_size = fb->len;
     memcpy(image_buffer, fb->buf, fb->len);
+    ESP_LOGI("Camera", "Captured image %d x %d", fb->width, fb->height);
+    ESP_LOGI("Camera", "Image buffer size %d", fb->len);
 
     bool converted = fmt2rgb888(fb->buf, fb->len, PIXFORMAT_JPEG, out_buf);
 
