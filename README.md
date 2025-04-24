@@ -1,69 +1,127 @@
-# Edge Impulse Example: standalone inferencing (Espressif ESP32)
+# ESP32 Photo Trap – Wildlife Detection using Edge Impulse (FOMO)
 
-This repository runs an exported impulse on the Espressif ESP32. See the documentation at [Running your impulse locally](https://docs.edgeimpulse.com/docs/running-your-impulse-locally-1).
+This project is a **photo trap** built on the **ESP32-S3** platform (or experimentally ESP32-P4) that uses an **Edge Impulse-trained neural network** to detect wildlife (e.g., deer, wild boars) and sends occurrences to **The Things Network (TTN)** via **LoRaWAN** using an **M5Stack LoRaWAN Module (EU868)**. For receiving the data, you can use application in [this](INSERT-LINK-HERE) repository.
 
-## Requirements
+After successful detection will wail 1 minute before it can detect again. This is to prevent too many multiple detections of the same animal in a short time. Sending images and storing images on the SD card will be executed at the same time. Device try to connect to TTN for 70 seconds. After that it will stop and go to sleep. To succesfully send the data you must be in range of gateway. Tested on 1.5 km with SenseCap M2 LoRaWAN gateway and M5Stack lorawan module.
 
-### Hardware
+## Device
+![photo-placeholder](INSERT-IMAGE-HERE.png)
 
-* [ESP-EYE](https://www.espressif.com/en/products/devkits/esp-eye/overview) or [ESP32-P4-Function-EV-Board](https://www.espressif.com/en/products/devkits/esp32-p4-function-ev-board/overview).
+---
 
-While the script is mainly tested with ESP-EYE, other ESP32-based development boards will work too.
+## Hardware Requirements
 
-### Software
+- **ESP32-S3-EYE or ESP32-P4_Function_EV_Board v1.4** (P4 version is partially non-functional, see notes below)
+- **Camera OV2640** (ESP32-S3) or **SC2336** (ESP32-P4, via MIPI)
+- **M5Stack LoRaWAN Module (EU868)**
+- Battery power supply (3.7V lithium battery) an power switch
+- Access to TTN (LoRaWAN)
+- PIR sensor (AM312)
+- uSD card (optional, for saving images) only for ESP32-S3
 
-* [Edge Impulse CLI](https://docs.edgeimpulse.com/docs/cli-installation).
+---
 
-* [ESP IDF 5.1.1](https://docs.espressif.com/projects/esp-idf/en/v5.1.1/esp32/get-started/index.html).
+## Wiring Overview
 
+TODO: Add wiring diagram
 
-## Building the application
+---
 
-### Get the Edge Impulse SDK
+## Edge Impulse Model
 
-Unzip the deployed `C++ library` from your Edge Impulse project and copy only the folders to the root directory of this repository:
+- The model is trained and exported using **Edge Impulse** in universal c++ library
+- Used via the `edge-impulse-sdk` in this project
+- This project is written from their standalone application
 
-   ```
-   example-standalone-inferencing-espressif-esp32/
-   ├─ edge-impulse-sdk
-   ├─ model-parameters
-   ├─ main
-   ├─ tflite-model
-   ├─ .gitignore
-   ├─ CMakeLists.txt
-   ├─ LICENSE
-   ├─ README.md
-   ├─ sdkconfig
-   ├─ sdkconfig.old
-   └─ partitions.csv
-   ```
+---
 
-### Compile
+## TTN Configuration
 
-1. Initialize ESP IDF:
-   ```bash
-   get_idf
-   ```
-2. Compile:
-   ```bash
-   idf.py build
-   ```
+1. Log in to [TTN Console](https://console.thethingsnetwork.org/)
+2. Create a new **application**
+3. Register a new end device in the application 
+4. Enter end device specifics manually
+5. Frequency plan: Europe 863-870 MHz (SF9 for RX2 - recommended)
+6. LoRaWAN Specification 1.0.3
+7. Enter JoinEUI for example 0000000000000000
+8. Generate DevEUI and AppKey.
+9. Enter device ID
+10. Register end device 
 
-### Flash
+---
 
-Connect the ESP32 board to your computer.
+## Setup LoRaWAN in sdkconfig for ESP-IDF
+1. Use `idf.py menuconfig` to open the configuration menu or in VS Code use `ESP-IDF: Open SDK Configuration Editor`
+2. Configure the LoRaWAN Configuration based on end device settings in TTN JoinEUI is the same as AppEUI
 
-Run:
-   ```bash
-   idf.py -p /dev/ttyUSB0 flash monitor
-   ```
+---
 
-Where ```/dev/ttyUSB0``` needs to be changed to actual port where ESP32 is connected on your system.
+## Software Requirements
+Tested on Windows 11
 
-### Serial connection
+- **ESP-IDF** (v5.4 or later)
+- **VS Code** (optional, but recommended)
+- **ESP-IDF Extension for VS Code** (optional, but recommended)
 
-Use screen, minicom or Serial monitor in Arduino IDE to set up a serial connection over USB. The following UART settings are used: 115200 baud, 8N1.
+---
 
-### Troubleshooting and optimization
+##  SDKCONFIG Settings
 
-When switching boards or upgrading to newer version of SDK, the `sdkconfig` file in the project folder gets overwritten. Run `idf.py menuconfig` to enter configuration menu and make sure that all the relevant performance settings (e.g. Flash SPI speed (80 MHz), CPU Frequency (240 MHz), CONFIG_COMPILER_OPTIMIZATION_PERF=y) are set.
+If using **VS Code + ESP-IDF Extension**, you can configure it like this:
+
+1. Use `ESP-IDF: SDK Configuration Editor` to select `sdkconfig.defaults.esp32s3` or `.esp32p4`
+2. Or manually edit `sdkconfig.defaults` and find LoRaWAN settings:
+
+```
+CONFIG_LWIP_IPV4=y
+CONFIG_APP_DEVICE_EUI="xx:xx:..."
+CONFIG_APP_APP_KEY="..."
+```
+
+Or use `idf.py menuconfig` to set up LoRaWAN settings.
+
+---
+
+## Building and Flashing
+
+All tested on Windows 11
+
+```bash
+idf.py set-target esp32s3        # or esp32p4
+idf.py menuconfig # set up LoRaWAN settings
+idf.py build
+idf.py -p COM12 flash monitor
+```
+
+COM port depends on your system. Replace `COM12` with the correct port for your device.
+
+In VS Code:
+- Select the target chip
+- select the port
+- SDK Configuration for LoRaWAN
+- build, flash and monitor
+
+---
+
+## ESP32-P4 Limitations
+
+- ESP32-P4 is **not supported by `esp_camera`**
+- The SC2336 camera via MIPI is **not yet supported** by `esp_camera` 
+- Camera support is being tested using [`esp-video`](https://github.com/espressif/esp-video) and the `who_cam` component, but it's not stable yet
+- ESP_video has problem with using SD card in ESP-BSP library.
+- SC2336 has problem with capturing images outside. Different camera is recommended
+
+---
+
+## Libraries and Dependencies
+
+- `esp-idf` (version defined in `dependencies.lock`)
+- `esp_camera` (for S3 and OV2640 only)
+- `edge-impulse-sdk`
+- `esp-bsp`
+- **M5Stack LoRaWAN module library** (Arduino-based, integrated manually)
+- For ESP32-P4:
+  - `esp-video` (for SC2336 camera)
+  - `who_cam` (for SC2336 camera)
+
+---
