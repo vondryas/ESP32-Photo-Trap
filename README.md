@@ -4,8 +4,21 @@ This project is a **photo trap** built on the **ESP32-S3** platform (or experime
 
 After successful detection will wail 1 minute before it can detect again. This is to prevent too many multiple detections of the same animal in a short time. Sending images and storing images on the SD card will be executed at the same time. Device try to connect to TTN for 70 seconds. After that it will stop and go to sleep. To succesfully send the data you must be in range of gateway. Tested on 1.5 km with SenseCap M2 LoRaWAN gateway and M5Stack lorawan module.
 
-## Device
-![photo-placeholder](INSERT-IMAGE-HERE.png)
+S3
+![s3](images/s3.png)
+
+P4
+![p4](images/p4.png)
+
+---
+
+## Software Requirements
+Tested on Windows 11
+
+- **ESP-IDF** (v5.4 or later)
+- **VS Code** (optional, but recommended)
+- **ESP-IDF Extension for VS Code** (optional, but recommended)
+- [TTN Console](https://console.thethingsnetwork.org/) account
 
 ---
 
@@ -14,16 +27,20 @@ After successful detection will wail 1 minute before it can detect again. This i
 - **ESP32-S3-EYE or ESP32-P4_Function_EV_Board v1.4** (P4 version is partially non-functional, see notes below)
 - **Camera OV2640** (ESP32-S3) or **SC2336** (ESP32-P4, via MIPI)
 - **M5Stack LoRaWAN Module (EU868)**
-- Battery power supply (3.7V lithium battery) an power switch
-- Access to TTN (LoRaWAN)
+- Battery power supply (3.7V lithium battery) an power switch. For S3 battery must have protection circuit. For P4 you must use external Li-Ion battery charger with protection circuit and step-up converter to 5V and cable USB-A to USB-C.
 - PIR sensor (AM312)
-- uSD card (optional, for saving images) only for ESP32-S3
+- uSD card (optional, for saving images) only for ESP32-S3¨
+
 
 ---
 
 ## Wiring Overview
 
-TODO: Add wiring diagram
+ESP32-S3-EYE (OV2640) + M5Stack LoRaWAN Module (EU868) + PIR Sensor
+![wiring s3](./images/esp-s3_diagram_front.png)
+![wiring s3](./images/esp-s3_diagram_back.png)
+ESP32-P4_Function_EV_Board v1.4 (SC2336) + M5Stack LoRaWAN Module (EU868) + PIR Sensor
+![wiring p4](./images/esp32-p4_diagram.png)
 
 ---
 
@@ -53,32 +70,6 @@ TODO: Add wiring diagram
 ## Setup LoRaWAN in sdkconfig for ESP-IDF
 1. Use `idf.py menuconfig` to open the configuration menu or in VS Code use `ESP-IDF: Open SDK Configuration Editor`
 2. Configure the LoRaWAN Configuration based on end device settings in TTN JoinEUI is the same as AppEUI
-
----
-
-## Software Requirements
-Tested on Windows 11
-
-- **ESP-IDF** (v5.4 or later)
-- **VS Code** (optional, but recommended)
-- **ESP-IDF Extension for VS Code** (optional, but recommended)
-
----
-
-##  SDKCONFIG Settings
-
-If using **VS Code + ESP-IDF Extension**, you can configure it like this:
-
-1. Use `ESP-IDF: SDK Configuration Editor` to select `sdkconfig.defaults.esp32s3` or `.esp32p4`
-2. Or manually edit `sdkconfig.defaults` and find LoRaWAN settings:
-
-```
-CONFIG_LWIP_IPV4=y
-CONFIG_APP_DEVICE_EUI="xx:xx:..."
-CONFIG_APP_APP_KEY="..."
-```
-
-Or use `idf.py menuconfig` to set up LoRaWAN settings.
 
 ---
 
