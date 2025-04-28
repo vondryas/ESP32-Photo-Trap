@@ -89,7 +89,7 @@ bool get_jpg_from_image_buffer(uint8_t *image_buffer, size_t *jpeg_length)
 
 void store_to_sdcard_task(void *arg)
 {
-    if(ESP_ERROR_CHECK_WITHOUT_ABORT(bsp_sdcard_mount()))
+    if(ESP_ERROR_CHECK_WITHOUT_ABORT(bsp_sdcard_mount()) == ESP_OK)
     {
         // store data to sd card
         ESP_LOGI(TAGsd, "Storing data to SD card...");

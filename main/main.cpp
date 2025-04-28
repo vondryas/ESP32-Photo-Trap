@@ -107,6 +107,9 @@ void send_task(const ei_impulse_result_t *result, bool try_second_time = true)
 
 extern "C" int app_main()
 {
+    // Measure time for inference
+    int64_t start_time = esp_timer_get_time();
+
     // results of the inference
     ei_impulse_result_t result = {nullptr};
     // semaphore for store task
@@ -166,24 +169,11 @@ extern "C" int app_main()
         vTaskDelay(1000 / portTICK_PERIOD_MS);
         esp_deep_sleep_start();
     }
+    ei_printf("Camera initialized\r\n");
     
     // Image buffer for inference have better colors after some frames
-    for (int i = 0; i < 20; i++)
-    {
-        #if defined(CONFIG_IDF_TARGET_ESP32P4)
-        camera->cam_fb_get();
-        camera->cam_fb_return();
+    vTaskDelay(500 / portTICK_PERIOD_MS);
 
-        #elif defined(CONFIG_IDF_TARGET_ESP32S3)
-        camera_fb_t *fb = esp_camera_fb_get();
-        esp_camera_fb_return(fb);
-
-        #endif
-    }
-
-    ei_printf("Camera initialized\r\n");
-
-    // SD card initialization
 
     // allocate image buffers for the image data
     if (allocate_image_buffers() == false)
@@ -222,6 +212,12 @@ extern "C" int app_main()
         return res;
     }
 
+    // Print the time it took to run from start to finish
+    int64_t end_time = esp_timer_get_time();
+    ei_printf("Inference time: %lld ms\r\n", (end_time - start_time) / 1000);
+    // print the time it took to run the DSP and inference
+    ei_printf("DSP time: %d ms\r\n", result.timing.dsp);
+    ei_printf("Inference time: %d ms\r\n", result.timing.classification);
     
     // if the inference result contains any detected classes, send the data to LoRaWAN
     // and store the image to SD card
