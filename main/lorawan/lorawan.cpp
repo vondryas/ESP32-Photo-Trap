@@ -3,8 +3,33 @@
 TaskHandle_t my_task_handle = NULL;
 RAK3172LoRaWAN lorawan;
 HardwareSerial Serial2(UART_NUM_2);
+RTC_NOINIT_ATTR bool lorawan_joined = false;
 
-bool lorawan_init(void (*loop_task)(void *))
+// Check if lorawan module have new event
+// for example Join event
+void lorawan_loop_task(void *arg)
+{
+    while (1)
+    {
+        lorawan.update();
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+    }
+}
+
+void lorawan_join_callback(bool status)
+{
+    lorawan_joined = status;
+    if (status)
+    {
+        printf("LoRaWAN joined\r\n");
+    }
+    else
+    {
+        printf("LoRaWAN join failed\r\n");
+    }
+}
+
+bool lorawan_init()
 {
     bool status = false;
 
@@ -76,9 +101,11 @@ bool lorawan_init(void (*loop_task)(void *))
         delay(500);
     }
 
+    lorawan.onJoin(lorawan_join_callback);
+
     if (my_task_handle == NULL)
     {
-        xTaskCreate(loop_task, "LoRaWANLoopTask", 1024 * 2, NULL, 1, &my_task_handle);
+        xTaskCreate(lorawan_loop_task, "LoRaWANLoopTask", 1024 * 2, NULL, 1, &my_task_handle);
     }
 
     return true;

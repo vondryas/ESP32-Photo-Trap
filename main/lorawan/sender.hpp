@@ -19,4 +19,9 @@ bool check_inference_result(const ei_impulse_result_t *result);
 //  Device must be joined to the LoRaWAN network before sending data
 bool send_data(const ei_impulse_result_t *result);
 
+// Try to send the data
+// recursively call the function if the first try fails and try join to the network again
+// If the second try fails, the function will return false and the program will go to deep sleep
+void send_task(const ei_impulse_result_t *result, bool try_second_time = true);
+
 #endif /* SENDER_HPP */

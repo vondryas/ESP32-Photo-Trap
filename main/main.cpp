@@ -17,11 +17,6 @@
 #define EDGE_IMPULSE_DEBUG false
 const char *TAG = "main";
 
-// Will know if device is joined to the network or not after deep sleep
-RTC_NOINIT_ATTR bool lorawan_joined = false;
-
-RTC_NOINIT_ATTR bool power_on = false; // Will know if device was powered on or not after deep sleep
-
 // Will be used to have some timeout after successful inference
 RTC_NOINIT_ATTR time_t last_inference_time; 
  
@@ -44,66 +39,6 @@ bsp_led_t bsp_led = BSP_LED_GREEN;
 #error "Unsupported target"
 
 #endif
-
-// Check if lorawan module have new event
-// for example Join event
-void lorawan_loop_task(void *arg)
-{
-    while (1)
-    {
-
-        lorawan.update();
-        vTaskDelay(10 / portTICK_PERIOD_MS);
-    }
-}
-
-void lorawan_join_callback(bool status)
-{
-    lorawan_joined = status;
-    if (status)
-    {
-        printf("LoRaWAN joined\r\n");
-    }
-    else
-    {
-        printf("LoRaWAN join failed\r\n");
-    }
-}
-
-// Try to join the network and send the data
-// recursively call the function if the first try fails and try join to the network again
-// If the second try fails, the function will return false and the program will go to deep sleep
-void send_task(const ei_impulse_result_t *result, bool try_second_time = true)
-{
-    if (lorawan_joined == false)
-    {
-        lorawan_join();
-    }
-    // 70 seconds timeout for joining
-    for (int i = 0; i < 700; i++)
-    {
-        if (lorawan_joined)
-        {
-            ei_printf("joined is true\r\n");
-            break;
-        }
-        vTaskDelay(100 / portTICK_PERIOD_MS);
-    }
-    if (send_data(result) == false)
-    {
-        ei_printf("Failed to send data via LoRaWAN\r\n");
-        if (try_second_time)
-        {
-            lorawan_joined = false;
-            send_task(result, false);
-        }
-    }
-    else
-    {
-        ei_printf("Data sent successfully\r\n");
-    }
-}
-
 
 extern "C" int app_main()
 {
@@ -128,20 +63,19 @@ extern "C" int app_main()
     esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
     if (wakeup_reason == ESP_SLEEP_WAKEUP_EXT1)
     {
-        power_on = false;
         ESP_LOGI(TAG, "wake up from PIR interrupt");
     }
     else
     {
-        power_on = true;
         time(&last_inference_time);
         ESP_LOGI(TAG, "Turn On device");
     }
     
     time(&now);
     
-    // check if device is powered on or if last inference was less than 60 seconds ago 
-    if (!power_on && (difftime(now, last_inference_time) < 60)) {
+    // check if last inference was less than 60 seconds ago
+    // this will result that device will be sleeping 60 senconds after power on
+    if ((difftime(now, last_inference_time) < 60)) {
         esp_deep_sleep_start();
     }
     
@@ -151,14 +85,11 @@ extern "C" int app_main()
     
     
     // loraWAN initialization
-    if (lorawan_init(lorawan_loop_task) == false)
+    if (lorawan_init() == false)
     {
         ei_printf("Failed to initialize LoRaWAN!\r\n");
         bsp_led_set(bsp_led, true);
     }
-    lorawan.onJoin(lorawan_join_callback);
-
-
     
     // Initialize camera 
     // without camera will program go to deep sleep
@@ -171,7 +102,7 @@ extern "C" int app_main()
     }
     ei_printf("Camera initialized\r\n");
     
-    // Image buffer for inference have better colors after some frames
+    // For better image quality, we wait for 500ms before taking a picture
     vTaskDelay(500 / portTICK_PERIOD_MS);
 
 
@@ -183,13 +114,13 @@ extern "C" int app_main()
         vTaskDelay(1000 / portTICK_PERIOD_MS);
         esp_deep_sleep_start();
     }
-
-
+    
+    
     // Set up signal for edge impulse classifier
     signal_t signal;
     signal.total_length = EI_CLASSIFIER_INPUT_WIDTH * EI_CLASSIFIER_INPUT_HEIGHT;
     signal.get_data = &camera_get_data;
-
+    
     // take a picture and store it in the image buffers
     // without image buffer the program will go to deep sleep
     if (camera_capture((size_t)EI_CLASSIFIER_INPUT_WIDTH, (size_t)EI_CLASSIFIER_INPUT_HEIGHT, image_inference_buffer) == false)
@@ -201,6 +132,9 @@ extern "C" int app_main()
         esp_deep_sleep_start();
     }
 
+    // Stop the camera and deinitialize it
+    camera_deinit();
+    
     // Start inference on the captured image
     EI_IMPULSE_ERROR res = run_classifier(&signal, &result, EDGE_IMPULSE_DEBUG);
     if (res != EI_IMPULSE_OK)
@@ -211,7 +145,7 @@ extern "C" int app_main()
         vTaskDelay(1000 / portTICK_PERIOD_MS);
         return res;
     }
-
+    
     // Print the time it took to run from start to finish
     int64_t end_time = esp_timer_get_time();
     ei_printf("Inference time: %lld ms\r\n", (end_time - start_time) / 1000);
@@ -241,9 +175,6 @@ extern "C" int app_main()
     // wait for store task to complete
     xSemaphoreTake(done_sem, portMAX_DELAY);
     
-    // Stop the camera and deinitialize it
-    camera_deinit();
-
     // free the image buffers
     free_image_buffers();
     

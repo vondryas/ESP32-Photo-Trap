@@ -15,8 +15,6 @@ bool check_inference_result(const ei_impulse_result_t *result)
     return false;
 }
 
-
-
 bool send_data(const ei_impulse_result_t *result)
 {
     if (result != nullptr)
@@ -76,4 +74,37 @@ bool send_data(const ei_impulse_result_t *result)
         return true;
     }
     return false;
+}
+
+
+void send_task(const ei_impulse_result_t *result, bool try_second_time)
+{
+    if (lorawan_joined == false)
+    {
+        lorawan_join();
+    }
+    // 70 seconds timeout for joining
+    for (int i = 0; i < 700; i++)
+    {
+
+        if (lorawan_joined)
+        {
+            // successfully joined the network
+            break;
+        }
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+    if (send_data(result) == false)
+    {
+        printf("Failed to send data via LoRaWAN\r\n");
+        if (try_second_time)
+        {
+            lorawan_joined = false;
+            send_task(result, false);
+        }
+    }
+    else
+    {
+        printf("Data sent successfully\r\n");
+    }
 }

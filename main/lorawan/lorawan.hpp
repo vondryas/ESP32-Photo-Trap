@@ -28,7 +28,7 @@
 // Initialize and set up the LoRaWAN module for EU868 band
 // and set The Things Network application settings.
 // Given a loop task to run in the background and a join callback function to call when the join process is finished.
-bool lorawan_init(void (*loop_task)(void *) = NULL);
+bool lorawan_init();
 
 // Only stop the task, not the LoRaWAN module.
 void lorawan_deinit(void);
@@ -52,5 +52,8 @@ bool lorawan_join(void);
 extern RAK3172LoRaWAN lorawan; // LoRaWAN module object
 
 extern HardwareSerial Serial2; // LoRaWAN module serial port object
+
+// Will know if device is joined to the network or not after deep sleep
+extern RTC_NOINIT_ATTR bool lorawan_joined;
 
 #endif /* LORAWAN_HPP */
