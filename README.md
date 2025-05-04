@@ -29,7 +29,7 @@ Tested on Windows 11
 - **M5Stack LoRaWAN Module (EU868)**
 - Battery power supply (3.7V lithium battery) an power switch. For S3 battery must have protection circuit. For P4 you must use external Li-Ion battery charger with protection circuit and step-up converter to 5V and cable USB-A to USB-C.
 - PIR sensor (AM312)
-- uSD card (optional, for saving images) only for ESP32-S3¨
+- uSD card (optional, for saving images)
 
 
 ---
@@ -109,10 +109,10 @@ In VS Code:
 - `esp-idf` (version defined in `dependencies.lock`)
 - `esp_camera` (for S3 and OV2640 only)
 - `edge-impulse-sdk`
-- `esp-bsp`
+- `esp-bsp` (name of bsp library is based on name of board)
 - **M5Stack LoRaWAN module library** (Arduino-based, integrated manually)
 - For ESP32-P4:
   - `esp-video` (for SC2336 camera)
-  - `who_cam` (for SC2336 camera)
+  - `who_cam` (for SC2336 camera) component from ESP WHO
 
 ---
