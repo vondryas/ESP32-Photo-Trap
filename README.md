@@ -52,7 +52,7 @@ ESP32-P4_Function_EV_Board v1.4 (SC2336) + M5Stack LoRaWAN Module (EU868) + PIR 
 
 ---
 
-## TTN Configuration
+## TTN add end device to application
 
 1. Log in to [TTN Console](https://console.thethingsnetwork.org/)
 2. Create a new **application**
