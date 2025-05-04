@@ -106,7 +106,7 @@ In VS Code:
 
 ## Libraries and Dependencies
 
-- `esp-idf` (version defined in `dependencies.lock`)
+- `esp-idf` (version 5.4)
 - `esp_camera` (for S3 and OV2640 only)
 - `edge-impulse-sdk`
 - `esp-bsp` (name of bsp library is based on name of board)
