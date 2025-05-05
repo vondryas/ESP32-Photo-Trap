@@ -3,7 +3,7 @@
 
 const char *labels[] = {"Deer or doe", "Wild pig"};
 
-bool check_inference_result(const ei_impulse_result_t *result)
+bool check_detection_result(const ei_impulse_result_t *result)
 {
     if (result != nullptr)
     {

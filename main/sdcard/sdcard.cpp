@@ -108,6 +108,7 @@ void store_to_sdcard_task(void *arg)
         }
         FILE* f = fopen(path.c_str(), "w");
         if (f != NULL) {
+            // write the image buffer to the file
             size_t written = fwrite(image_buffer, sizeof(uint8_t), image_buffer_size, f);
             fflush(f);
             fclose(f);
@@ -122,7 +123,7 @@ void store_to_sdcard_task(void *arg)
             printf("Error opening file for writing\n");
         }
         deinit_nvs_flash();
-        ESP_LOGI(TAGsd, "Cosing NVS");
+        ESP_LOGI(TAGsd, "Closing NVS");
         bsp_sdcard_unmount();
         ESP_LOGI(TAGsd, "Unmounting SD card...");
     }

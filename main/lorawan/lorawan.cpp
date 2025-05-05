@@ -1,8 +1,11 @@
 #include "lorawan.hpp"
 
-TaskHandle_t my_task_handle = NULL;
+// LoRaWAN device object
 RAK3172LoRaWAN lorawan;
+
+// LoRaWAN UART interface
 HardwareSerial Serial2(UART_NUM_2);
+
 RTC_NOINIT_ATTR bool lorawan_joined = false;
 
 // Check if lorawan module have new event
@@ -101,23 +104,12 @@ bool lorawan_init()
         delay(500);
     }
 
-    lorawan.onJoin(lorawan_join_callback);
 
-    if (my_task_handle == NULL)
-    {
-        xTaskCreate(lorawan_loop_task, "LoRaWANLoopTask", 1024 * 2, NULL, 1, &my_task_handle);
-    }
+    lorawan.onJoin(lorawan_join_callback);
+    // Start the LoRaWAN loop task
+    xTaskCreate(lorawan_loop_task, "LoRaWANLoopTask", 1024 * 2, NULL, 1, NULL);
 
     return true;
-}
-
-void lorawan_deinit(void)
-{
-    if (my_task_handle != NULL)
-    {
-        vTaskDelete(my_task_handle);
-        my_task_handle = NULL;
-    }
 }
 
 size_t lorawan_send(const String &data)

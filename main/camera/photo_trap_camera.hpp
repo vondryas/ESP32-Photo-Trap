@@ -36,7 +36,7 @@ bool allocate_image_buffers(void);
 void free_image_buffers(void);
 
 extern uint8_t *image_buffer; // Buffer for the image data
-extern uint8_t *image_inference_buffer; // Buffer for the image data used for inference
+extern uint8_t *image_detection_buffer; // Buffer for the image data used for inference
 extern size_t image_buffer_size; // Size of the image buffer
 
 #if defined(CONFIG_IDF_TARGET_ESP32P4)

@@ -6,11 +6,7 @@ who::cam::WhoP4Cam *camera = nullptr;
 
 static bool is_camera_initialised = false;
 
-/**
- * @brief   Setup image sensor & start streaming
- *
- * @retval  false if initialisation failed
- */
+// Start camera
 bool camera_init(void)
 {
 
@@ -23,9 +19,7 @@ bool camera_init(void)
     return true;
 }
 
-/**
- * @brief      Stop streaming of sensor data
- */
+// Stop camera
 void camera_deinit(void)
 {
 
@@ -38,17 +32,8 @@ void camera_deinit(void)
     return;
 }
 
-/**
- * @brief      Capture, rescale and crop image
- *
- * @param[in]  img_width     width of output image
- * @param[in]  img_height    height of output image
- * @param[in]  out_buf       pointer to store output image, NULL may be used
- *                           if ei_camera_frame_buffer is to be used for capture and resize/cropping.
- *
- * @retval     false if not initialised, image captured, rescaled or cropped failed
- *
- */
+
+// slightly modified version of the camera_capture function from Edge Impulse examples
 bool camera_capture(uint32_t img_width, uint32_t img_height, uint8_t *out_buf)
 {
 
@@ -56,14 +41,14 @@ bool camera_capture(uint32_t img_width, uint32_t img_height, uint8_t *out_buf)
 
     if (!is_camera_initialised)
     {
-        ei_printf("ERR: Camera is not initialized\r\n");
+        printf("ERR: Camera is not initialized\r\n");
         return false;
     }
 
     auto *fb = camera->cam_fb_get();
     if (!fb)
     {
-        ei_printf("Camera capture failed\n");
+        printf("Camera capture failed\n");
         return false;
     }
 
@@ -76,7 +61,7 @@ bool camera_capture(uint32_t img_width, uint32_t img_height, uint8_t *out_buf)
 
     if (fb->format != who::cam::VIDEO_PIX_FMT_RGB888)
     {
-        ei_printf("Conversion failed\n");
+        printf("Conversion failed\n");
         return false;
     }
 
@@ -94,11 +79,12 @@ bool camera_capture(uint32_t img_width, uint32_t img_height, uint8_t *out_buf)
             out_buf,
             img_width,
             img_height);
-        ei_printf("Resized image to %d x %d\n", img_width, img_height);
+        printf("Resized image to %d x %d\n", img_width, img_height);
     }
     return true;
 }
 
+// this function is from Edge Impulse examples
 int camera_get_data(size_t offset, size_t length, float *out_ptr)
 {
     // we already have a RGB888 buffer, so recalculate offset into pixel index

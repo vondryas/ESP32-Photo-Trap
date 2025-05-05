@@ -101,20 +101,20 @@ void camera_deinit(void)
     return;
 }
 
-
+// slightly modified version of the camera_capture function from Edge Impulse examples
 bool camera_capture(uint32_t img_width, uint32_t img_height, uint8_t *out_buf)
 {
     bool do_resize = false;
 
     if (out_buf == nullptr)
     {
-        ei_printf("ERR: out_buf is null\r\n");
+        printf("ERR: out_buf is null\r\n");
         return false;
     }
 
     if (!is_camera_initialised)
     {
-        ei_printf("ERR: Camera is not initialized\r\n");
+        printf("ERR: Camera is not initialized\r\n");
         return false;
     }
 
@@ -122,7 +122,7 @@ bool camera_capture(uint32_t img_width, uint32_t img_height, uint8_t *out_buf)
 
     if (!fb)
     {
-        ei_printf("Camera capture failed\n");
+        printf("Camera capture failed\n");
         return false;
     }
 
@@ -137,7 +137,7 @@ bool camera_capture(uint32_t img_width, uint32_t img_height, uint8_t *out_buf)
 
     if (!converted)
     {
-        ei_printf("Conversion failed\n");
+        printf("Conversion failed\n");
         return false;
     }
 
@@ -159,16 +159,19 @@ bool camera_capture(uint32_t img_width, uint32_t img_height, uint8_t *out_buf)
     return true;
 }
 
+
+// implementation of the get_data function for edge impulse classifier
+// this function is from Edge Impulse examples
 int camera_get_data(size_t offset, size_t length, float *out_ptr)
 {
     if (image_buffer == nullptr)
     {
-        ei_printf("ERR: image buffer is null\r\n");
+        printf("ERR: image buffer is null\r\n");
         return -1;
     }
-    if (image_inference_buffer == nullptr)
+    if (image_detection_buffer == nullptr)
     {
-        ei_printf("ERR: image inference buffer is null\r\n");
+        printf("ERR: image inference buffer is null\r\n");
         return -1;
     }
 
@@ -181,8 +184,8 @@ int camera_get_data(size_t offset, size_t length, float *out_ptr)
     {
         // Swap BGR to RGB here
         // due to https://github.com/espressif/esp32-camera/issues/379
-        out_ptr[out_ptr_ix] = (image_inference_buffer[pixel_ix + 2] << 16) +
-                              (image_inference_buffer[pixel_ix + 1] << 8) + image_inference_buffer[pixel_ix];
+        out_ptr[out_ptr_ix] = (image_detection_buffer[pixel_ix + 2] << 16) +
+                              (image_detection_buffer[pixel_ix + 1] << 8) + image_detection_buffer[pixel_ix];
 
         // go to the next pixel
         out_ptr_ix++;

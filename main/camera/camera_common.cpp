@@ -2,7 +2,7 @@
 
 bool is_camera_buffer_allocated = false;
 uint8_t *image_buffer = NULL; 
-uint8_t *image_inference_buffer = NULL; // Buffer for the image data used for inference
+uint8_t *image_detection_buffer = NULL; // Buffer for the image data used for inference
 size_t image_buffer_size = 0;
 
 bool allocate_image_buffers(void)
@@ -19,8 +19,8 @@ bool allocate_image_buffers(void)
         return false;
     }
     
-    image_inference_buffer = (uint8_t *)malloc(CAMERA_RAW_FRAME_BUFFER_COLS * CAMERA_RAW_FRAME_BUFFER_ROWS * CAMERA_FRAME_BYTE_SIZE);;
-    if (image_inference_buffer == NULL) {
+    image_detection_buffer = (uint8_t *)malloc(CAMERA_RAW_FRAME_BUFFER_COLS * CAMERA_RAW_FRAME_BUFFER_ROWS * CAMERA_FRAME_BYTE_SIZE);;
+    if (image_detection_buffer == NULL) {
         ei_printf("Failed to allocate image inference buffer\n");
         free(image_buffer);
         image_buffer = NULL;
@@ -41,9 +41,9 @@ void free_image_buffers(void)
         image_buffer = NULL;
     }
 
-    if (image_inference_buffer != NULL) {
-        free(image_inference_buffer);
-        image_inference_buffer = NULL;
+    if (image_detection_buffer != NULL) {
+        free(image_detection_buffer);
+        image_detection_buffer = NULL;
     }
 
     is_camera_buffer_allocated = false;
