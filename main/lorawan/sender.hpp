@@ -4,10 +4,11 @@
 #include <stdio.h>
 #include "edge-impulse-sdk/classifier/ei_classifier_types.h"
 
+// Type of the detected animal
 typedef enum detected_class_t
 {
     DEER_OR_DOE = 0,
-    WILD_PIG = 1,
+    WILD_BOAR = 1,
 } detected_class_t;
 
 //  Check if the inference result contains any detected classes

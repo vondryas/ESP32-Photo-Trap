@@ -46,7 +46,7 @@
 #include "edge-impulse-sdk/classifier/ei_model_types.h"
 #include "edge-impulse-sdk/classifier/inferencing_engines/engines.h"
 
-const char* ei_classifier_inferencing_categories[] = { "Deer or doe", "Wild pig" };
+const char* ei_classifier_inferencing_categories[] = { "Deer or doe", "Wild boar" };
 
 ei_dsp_named_axis_t ei_dsp_config_26_named_axes[] = {
     { .name = "Image", .axis = 0 }

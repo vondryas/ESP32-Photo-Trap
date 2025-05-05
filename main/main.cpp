@@ -13,14 +13,12 @@
 #include "esp_idf_version.h"
 #include "bsp/esp-bsp.h"
 
-
 #define EDGE_IMPULSE_DEBUG false
 const char *TAG = "main";
 
 // Will be used to have some timeout after successful detection
 RTC_NOINIT_ATTR time_t last_detection_time; 
  
-
 // Board specific settings
 #if defined(CONFIG_IDF_TARGET_ESP32S3)
 

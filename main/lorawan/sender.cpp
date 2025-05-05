@@ -1,7 +1,7 @@
 #include "sender.hpp"
 #include "lorawan.hpp"
 
-const char *labels[] = {"Deer or doe", "Wild pig"};
+const char *labels[] = { "Deer or doe", "Wild boar" };
 
 bool check_detection_result(const ei_impulse_result_t *result)
 {
@@ -22,7 +22,7 @@ bool send_data(const ei_impulse_result_t *result)
         uint8_t data_to_send[4] = {0};
         size_t data_to_send_len;
         uint8_t doe_number = 0;
-        uint8_t pig_number = 0;
+        uint8_t wild_boar_number = 0;
         for (int i = 0; i < result->bounding_boxes_count; i++)
         {
             if (strcmp(result->bounding_boxes[i].label, labels[0]) == 0)
@@ -31,14 +31,14 @@ bool send_data(const ei_impulse_result_t *result)
             }
             else if (strcmp(result->bounding_boxes[i].label, labels[1]) == 0)
             {
-                pig_number++;
+                wild_boar_number++;
             }
         }
         
         // format the data to be sent to LoRaWAN
         // class of the detected object and the number of detected objects
-        // 0: Deer or doe, 1: Wild pig
-        // example: 0 2 1 3 means 2 deer or doe and 3 wild pigs detected
+        // 0: Deer or doe, 1: Wild boar
+        // example: 0 2 1 3 means 2 deer or doe and 3 wild boars detected
         // 1 2 means 2 wild pig detected
         // 0 1 means 1 deer or doe detected
         if (doe_number > 0)
@@ -47,19 +47,19 @@ bool send_data(const ei_impulse_result_t *result)
             data_to_send[1] = doe_number;
             data_to_send_len = 2;
         }
-        if (pig_number > 0 && doe_number > 0)
+        if (wild_boar_number > 0 && doe_number > 0)
         {
-            data_to_send[2] = WILD_PIG;
-            data_to_send[3] = pig_number;
+            data_to_send[2] = WILD_BOAR;
+            data_to_send[3] = wild_boar_number;
             data_to_send_len = 4;
         }
-        else if (pig_number > 0 && doe_number == 0)
+        else if (wild_boar_number > 0 && doe_number == 0)
         {
-            data_to_send[0] = WILD_PIG;
-            data_to_send[1] = pig_number;
+            data_to_send[0] = WILD_BOAR;
+            data_to_send[1] = wild_boar_number;
             data_to_send_len = 2;
         }
-        else if (doe_number == 0 && pig_number == 0)
+        else if (doe_number == 0 && wild_boar_number == 0)
         {
             return false;
         }
@@ -99,6 +99,7 @@ void send_task(const ei_impulse_result_t *result, bool try_second_time)
         printf("Failed to send data via LoRaWAN\r\n");
         if (try_second_time)
         {
+            // try to join the network again and send the data again
             lorawan_joined = false;
             send_task(result, false);
         }
