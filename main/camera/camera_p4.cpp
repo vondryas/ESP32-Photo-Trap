@@ -93,8 +93,8 @@ int camera_get_data(size_t offset, size_t length, float *out_ptr)
     size_t out_ptr_ix = 0;
     while (pixels_left != 0)
     {
-        out_ptr[out_ptr_ix] = (image_inference_buffer[pixel_ix] << 16) +
-                              (image_inference_buffer[pixel_ix + 1] << 8) + image_inference_buffer[pixel_ix + 2];
+        out_ptr[out_ptr_ix] = (image_detection_buffer[pixel_ix] << 16) +
+                              (image_detection_buffer[pixel_ix + 1] << 8) + image_detection_buffer[pixel_ix + 2];
 
         // go to the next pixel
         out_ptr_ix++;

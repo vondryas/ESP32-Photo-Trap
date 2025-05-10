@@ -81,14 +81,10 @@ extern "C" int app_main()
     bsp_leds_init();
     bsp_led_set(bsp_led, false);
     
+    int64_t end_time = esp_timer_get_time();
+    printf("Time before initialization: %lld ms\r\n", (end_time - start_time) / 1000);
     
-    // loraWAN initialization
-    if (lorawan_init() == false)
-    {
-        printf("Failed to initialize LoRaWAN!\r\n");
-        esp_deep_sleep_start();
-    }
-    
+
     // Initialize camera 
     // without camera will program go to deep sleep
     if (camera_init() == false)
@@ -97,9 +93,12 @@ extern "C" int app_main()
         esp_deep_sleep_start();
     }
     printf("Camera initialized\r\n");
+
+    end_time = esp_timer_get_time();
+    printf("camera initialized: %lld ms\r\n", (end_time - start_time) / 1000);
     
     // For better image quality, we wait for 500ms before taking a picture
-    vTaskDelay(500 / portTICK_PERIOD_MS);
+    vTaskDelay(750 / portTICK_PERIOD_MS);
 
     // allocate image buffers for the image data
     if (allocate_image_buffers() == false)
@@ -108,8 +107,8 @@ extern "C" int app_main()
         esp_deep_sleep_start();
     }
     
-    // for testing purposes, we can print the time it took to initialize the camera and allocate the image buffers
-    int64_t end_time = esp_timer_get_time();
+    // for testing purposes
+    end_time = esp_timer_get_time();
     printf("Ready to capture: %lld ms\r\n", (end_time - start_time) / 1000);
     
     
@@ -125,6 +124,10 @@ extern "C" int app_main()
         camera_deinit();
         esp_deep_sleep_start();
     }
+
+    // for testing purposes
+    end_time = esp_timer_get_time();
+    printf("captured photo: %lld ms\r\n", (end_time - start_time) / 1000);
     
     // Stop the camera and deinitialize it
     camera_deinit();
@@ -158,6 +161,17 @@ extern "C" int app_main()
         // successful detection, store time
         time(&last_detection_time);   // store the image to SD card
         xTaskCreate(store_to_sdcard_task, "store_to_sdcard_task", 4096 * 4, NULL, 5, NULL);
+
+        // loraWAN initialization
+        if (lorawan_init() == false)
+        {
+            printf("Failed to initialize LoRaWAN!\r\n");
+            esp_deep_sleep_start();
+        }
+        
+        end_time = esp_timer_get_time();
+        printf("LoRaWAN initialized: %lld ms\r\n", (end_time - start_time) / 1000);
+
         //send the data to LoRaWAN
         send_task(&result);
     } 

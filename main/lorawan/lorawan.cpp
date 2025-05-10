@@ -43,7 +43,7 @@ bool lorawan_init()
         {
             break;
         }
-        delay(500);
+        delay(50);
     }
 
     if (!status)
@@ -59,7 +59,7 @@ bool lorawan_init()
         {
             break;
         }
-        delay(500);
+        delay(50);
     }
 
     if (!status)
@@ -74,7 +74,7 @@ bool lorawan_init()
         {
             break;
         }
-        delay(500);
+        delay(50);
     }
 
     for (int i = 0; i < 10; i++)
@@ -83,7 +83,7 @@ bool lorawan_init()
         {
             break;
         }
-        delay(500);
+        delay(50);
     }
 
     for (int i = 0; i < 10; i++)
@@ -92,7 +92,7 @@ bool lorawan_init()
         {
             break;
         }
-        delay(500);
+        delay(50);
     }
 
     for (int i = 0; i < 10; i++)
@@ -101,7 +101,7 @@ bool lorawan_init()
         {
             break;
         }
-        delay(500);
+        delay(50);
     }
 
 
