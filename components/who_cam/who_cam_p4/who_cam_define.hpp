@@ -16,8 +16,8 @@ typedef enum {
 typedef struct {
     void *buf;
     size_t len;
-    int width;
-    int height;
+    uint16_t width;
+    uint16_t height;
     video_pix_fmt_t format;
     struct timeval timestamp;
 } video_fb_t;
