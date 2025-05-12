@@ -167,6 +167,10 @@ extern "C" int app_main()
         if (lorawan_init() == false)
         {
             printf("Failed to initialize LoRaWAN!\r\n");
+            // if LoRaWAN init fails wait for store task to finish and free the image buffers
+            // then go to deep sleep
+            xSemaphoreTake(done_sem, portMAX_DELAY);
+            free_image_buffers();
             esp_deep_sleep_start();
         }
         
