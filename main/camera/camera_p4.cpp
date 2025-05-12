@@ -34,7 +34,8 @@ void camera_deinit(void)
 }
 
 
-// slightly modified version of the camera_capture function from Edge Impulse examples
+// slightly modified version of the camera_capture function from Edge Impulse examples 
+// modified is storage of the image in buffers
 bool camera_capture(uint32_t img_width, uint32_t img_height, uint8_t *out_buf)
 {
 
@@ -85,7 +86,9 @@ bool camera_capture(uint32_t img_width, uint32_t img_height, uint8_t *out_buf)
     return true;
 }
 
-// this function is from Edge Impulse examples
+// This function is from Edge Impulse examples
+// it is used to get the image data from the buffer
+// its modified because orginal function uses RGB888 with switched color channels
 int camera_get_data(size_t offset, size_t length, float *out_ptr)
 {
     // we already have a RGB888 buffer, so recalculate offset into pixel index

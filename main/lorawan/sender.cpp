@@ -4,11 +4,12 @@
 
 const char *labels[] = { "Deer or doe", "Wild boar" };
 
+// check if the detection result contains any detected classes
 bool check_detection_result(const ei_impulse_result_t *result)
 {
     if (result != nullptr)
     {
-        if (result->bounding_boxes_count)
+        if (result->bounding_boxes_count > 0)
         {
             return true;
         }

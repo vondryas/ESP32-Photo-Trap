@@ -102,7 +102,7 @@ void camera_deinit(void)
     return;
 }
 
-// slightly modified version of the camera_capture function from Edge Impulse examples
+// slightly modified version of the ei_camera_capture function from Edge Impulse examples
 bool camera_capture(uint32_t img_width, uint32_t img_height, uint8_t *out_buf)
 {
     bool do_resize = false;
@@ -162,7 +162,7 @@ bool camera_capture(uint32_t img_width, uint32_t img_height, uint8_t *out_buf)
 
 
 // implementation of the get_data function for edge impulse classifier
-// this function is from Edge Impulse examples
+// this function is from Edge Impulse examples renamed from ei_camera_get_data
 int camera_get_data(size_t offset, size_t length, float *out_ptr)
 {
     if (image_buffer == nullptr)
