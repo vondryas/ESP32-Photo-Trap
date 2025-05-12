@@ -1,9 +1,9 @@
 MIT License
 
 This license applies to all original code in this project authored by the developer,
-EXCLUDING the 'edge-impulse-sdk' component, which is licensed separately under the Clear BSD License (© EdgeImpulse Inc.).
+EXCLUDING the 'edge-impulse-sdk', 'model-parameters' and 'tflite-model' component, which is licensed separately under the Clear BSD License (© EdgeImpulse Inc.).
 
-Copyright (c) 2025 Štěpán Vondráček
+Copyright (c) 2025 Stepan Vondracek
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
