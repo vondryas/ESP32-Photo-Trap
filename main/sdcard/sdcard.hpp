@@ -1,3 +1,4 @@
+//author: Stepan Vondracek (xvondr27) 
 #ifndef SDCARD_HPP
 #define SDCARD_HPP
 

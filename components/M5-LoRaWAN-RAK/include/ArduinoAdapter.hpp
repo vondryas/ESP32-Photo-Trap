@@ -1,3 +1,5 @@
+//author: Stepan Vondracek (xvondr27) 
+
 #ifndef ARDUINO_ADAPTER_HPP
 #define ARDUINO_ADAPTER_HPP
 

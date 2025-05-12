@@ -1,3 +1,4 @@
+//author: Stepan Vondracek (xvondr27) 
 #ifndef LORAWAN_HPP
 #define LORAWAN_HPP
 

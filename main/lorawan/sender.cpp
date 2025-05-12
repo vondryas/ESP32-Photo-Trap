@@ -1,3 +1,4 @@
+//author: Stepan Vondracek (xvondr27) 
 #include "sender.hpp"
 #include "lorawan.hpp"
 

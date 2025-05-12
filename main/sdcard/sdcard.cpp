@@ -1,3 +1,4 @@
+//author: Stepan Vondracek (xvondr27) 
 #include "sdcard.hpp"
 
 SemaphoreHandle_t done_sem = NULL;

@@ -1,3 +1,4 @@
+//author: Stepan Vondracek (xvondr27) 
 #ifndef SENDER_HPP
 #define SENDER_HPP
 

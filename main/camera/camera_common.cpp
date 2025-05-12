@@ -1,3 +1,4 @@
+//author: Stepan Vondracek (xvondr27) 
 #include "photo_trap_camera.hpp"
 
 bool is_camera_buffer_allocated = false;

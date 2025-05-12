@@ -1,3 +1,4 @@
+//author: Stepan Vondracek (xvondr27) 
 #include "photo_trap_camera.hpp"
 #if defined(CONFIG_IDF_TARGET_ESP32S3)
 #include "esp_camera.h"

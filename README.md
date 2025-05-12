@@ -31,7 +31,6 @@ Tested on Windows 11
 - PIR sensor (AM312)
 - uSD card (optional, for saving images)
 
-
 ---
 
 ## Wiring Overview
@@ -47,8 +46,15 @@ ESP32-P4_Function_EV_Board v1.4 (SC2336) + M5Stack LoRaWAN Module (EU868) + PIR 
 ## Edge Impulse Model
 
 - The model is trained and exported using **Edge Impulse** in universal c++ library
+- Used is FOMO model
 - Used via the `edge-impulse-sdk` in this project
 - This project is written from their standalone application
+
+## Dataset
+
+This project used these datasets for model training:
+- [My Game Pics](https://universe.roboflow.com/my-game-pics/my-game-pics) 
+- [Forest](https://universe.roboflow.com/nicolasfree/forest-jitth)
 
 ---
 
@@ -84,6 +90,7 @@ ESP32-P4_Function_EV_Board v1.4 (SC2336) + M5Stack LoRaWAN Module (EU868) + PIR 
 
 All tested on Windows 11
 
+
 ```bash
 idf.py set-target esp32s3        # or esp32p4
 idf.py menuconfig # set up LoRaWAN settings
@@ -93,11 +100,13 @@ idf.py -p COM12 flash monitor
 
 COM port depends on your system. Replace `COM12` with the correct port for your device.
 
-In VS Code:
+In VS Code extension:
 - Select the target chip
 - select the port
 - SDK Configuration for LoRaWAN
 - build, flash and monitor
+
+LoRaWAN settings must be set otherwise the device will not send data to The Things Network.
 
 ---
 
@@ -105,7 +114,7 @@ In VS Code:
 
 - ESP32-P4 is **not supported by `esp_camera`**
 - The SC2336 camera via MIPI is **not yet supported** by `esp_camera` 
-- Camera support is being tested using [`esp-video`](https://github.com/espressif/esp-video) and the `who_cam` component, but it's not stable yet
+- Camera support is being tested using [`esp-video`](https://github.com/espressif/esp-video) and the `who_cam` component, but it's not stable
 - ESP_video has problem with using SD card in ESP-BSP library.
 - SC2336 has problem with capturing images outside. Different camera is recommended
 

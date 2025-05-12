@@ -1,3 +1,4 @@
+//author: Stepan Vondracek (xvondr27) 
 #include <stdio.h>
 #include "edge-impulse-sdk/classifier/ei_run_classifier.h"
 #include "edge-impulse-sdk/dsp/image/image.hpp"

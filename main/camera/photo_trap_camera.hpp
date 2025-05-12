@@ -1,3 +1,4 @@
+//author: Stepan Vondracek (xvondr27) 
 #ifndef PHOTO_TRAP_CAMERA_HPP
 #define PHOTO_TRAP_CAMERA_HPP
 
